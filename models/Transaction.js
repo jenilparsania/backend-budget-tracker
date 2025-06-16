@@ -20,7 +20,7 @@ const userSchema = new Schema({
     }
 }, { timestamps: true });
 
-const entitySchema = new Schema({
+const transactionSchema = new Schema({
     userId: {
         type: ObjectId,
         ref: 'User',
@@ -38,7 +38,8 @@ const entitySchema = new Schema({
     },
     category: {
         type: String,
-        required: true
+        required: true,
+        enum: ['salary', 'food', 'transport', 'entertainment', 'utilities', 'other']
     },
     date: {
         type: Date,
@@ -46,7 +47,8 @@ const entitySchema = new Schema({
     },
     description: {
         type: String,
-        required: true
+        required: true,
+        trim: true
     },
     isRecurring: {
         type: Boolean,
@@ -55,10 +57,10 @@ const entitySchema = new Schema({
 }, { timestamps: true });
 
 // Create models from the Schemas
-const EntityModel = mongoose.model("Entity", entitySchema);
+const TransactionModel = mongoose.model("Transaction", transactionSchema);
 const UserModel = mongoose.model("User", userSchema);
 
 module.exports = {
-    EntityModel,
+    TransactionModel,
     UserModel
 };
