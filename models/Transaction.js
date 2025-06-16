@@ -4,22 +4,61 @@ const Schema = mongoose.Schema;
 const ObjectId = mongoose.Types.ObjectId;
 
 const userSchema = new Schema({
-    username : String,
-    password : String
-})
-const entitySchema = new Schema({
-    type:"income" || "expense",
-    amount : Number,
-    category : String,
-    date : Date,
-    description : String,
-    isRecurring : Boolean
-});
+    username: {
+        type: String,
+        required: true,
+        unique: true,
+        trim: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    balance: {
+        type: Number,
+        default: 0
+    }
+}, { timestamps: true });
 
-// Create a model from the Schema
-const EntityModel = mongoose.model("Entity",entitySchema);
-const UserModel = mongoose.model("User",userSchema);
+const entitySchema = new Schema({
+    userId: {
+        type: ObjectId,
+        ref: 'User',
+        required: true
+    },
+    type: {
+        type: String,
+        enum: ['income', 'expense'],
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true,
+        min: 0
+    },
+    category: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    isRecurring: {
+        type: Boolean,
+        default: false
+    }
+}, { timestamps: true });
+
+// Create models from the Schemas
+const EntityModel = mongoose.model("Entity", entitySchema);
+const UserModel = mongoose.model("User", userSchema);
+
 module.exports = {
     EntityModel,
     UserModel
-}
+};
