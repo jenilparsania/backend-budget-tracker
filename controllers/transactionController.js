@@ -79,7 +79,7 @@ const getTransactions = async (req, res) => {
             startDate, 
             endDate, 
             page = 1, 
-            limit = 10,
+            limit = 5,
             sortBy = 'date',
             sortOrder = 'desc'
         } = req.query;
