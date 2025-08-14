@@ -84,6 +84,30 @@ const getTransactions = async (req, res) => {
             sortOrder = 'desc'
         } = req.query;
 
+        // Validate pagination parameters
+        const pageNum = parseInt(page);
+        const limitNum = parseInt(limit);
+        
+        if (pageNum < 1 || limitNum < 1 || limitNum > 100) {
+            return res.status(400).json({
+                message: "Invalid pagination parameters. Page must be >= 1, limit must be between 1 and 100"
+            });
+        }
+
+        // Validate sort parameters
+        const validSortFields = ['date', 'amount', 'category', 'type'];
+        if (!validSortFields.includes(sortBy)) {
+            return res.status(400).json({
+                message: "Invalid sort field. Must be one of: " + validSortFields.join(', ')
+            });
+        }
+
+        if (!['asc', 'desc'].includes(sortOrder)) {
+            return res.status(400).json({
+                message: "Invalid sort order. Must be 'asc' or 'desc'"
+            });
+        }
+
         // Build filter object
         const filter = { userId };
         
@@ -91,8 +115,24 @@ const getTransactions = async (req, res) => {
         if (category) filter.category = category;
         if (startDate || endDate) {
             filter.date = {};
-            if (startDate) filter.date.$gte = new Date(startDate);
-            if (endDate) filter.date.$lte = new Date(endDate);
+            if (startDate) {
+                const start = new Date(startDate);
+                if (isNaN(start.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid start date format"
+                    });
+                }
+                filter.date.$gte = start;
+            }
+            if (endDate) {
+                const end = new Date(endDate);
+                if (isNaN(end.getTime())) {
+                    return res.status(400).json({
+                        message: "Invalid end date format"
+                    });
+                }
+                filter.date.$lte = end;
+            }
         }
 
         // Build sort object
@@ -100,13 +140,13 @@ const getTransactions = async (req, res) => {
         sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
 
         // Calculate pagination
-        const skip = (page - 1) * limit;
+        const skip = (pageNum - 1) * limitNum;
 
         // Execute query with pagination
         const transactions = await TransactionModel.find(filter)
             .sort(sort)
             .skip(skip)
-            .limit(parseInt(limit));
+            .limit(limitNum);
 
         // Get total count for pagination
         const total = await TransactionModel.countDocuments(filter);
@@ -114,11 +154,11 @@ const getTransactions = async (req, res) => {
         res.json({
             transactions,
             pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(total / limit),
+                currentPage: pageNum,
+                totalPages: Math.ceil(total / limitNum),
                 totalTransactions: total,
-                hasNextPage: page * limit < total,
-                hasPrevPage: page > 1
+                hasNextPage: pageNum * limitNum < total,
+                hasPrevPage: pageNum > 1
             }
         });
     } catch (error) {

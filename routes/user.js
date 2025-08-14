@@ -23,7 +23,7 @@ router.post("/signup", async function(req, res) {
     const { success, data } = signupBody.safeParse(req.body);
 
     if (!success) {
-        return res.status(411).json({
+        return res.status(400).json({
             message: "Incorrect inputs"
         });
     }
@@ -62,7 +62,7 @@ router.post("/signin", async function(req, res) {
     const { success, data } = signinBody.safeParse(req.body);
 
     if (!success) {
-        return res.status(411).json({
+        return res.status(400).json({
             message: "Incorrect inputs"
         });
     }

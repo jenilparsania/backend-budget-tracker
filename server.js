@@ -11,7 +11,7 @@ const { mongoURL } = require("./config/config");
 app.use(cors({
   origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Accept'],
+  allowedHeaders: ['Content-Type', 'Accept', 'Authorization'],
 }));
 app.use(express.json());
 
@@ -39,6 +39,4 @@ async function main() {
 }
 
 main();
-
-// update request to update the transaction is still remaining
 

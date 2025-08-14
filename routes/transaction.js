@@ -13,6 +13,9 @@ const {
 // Create a new transaction
 router.post("/", authMiddleware, createTransaction);
 
+// Get transaction statistics (must come before general route)
+router.get("/stats/summary", authMiddleware, getTransactionStats);
+
 // Get all transactions for a user (with filtering, pagination, sorting)
 router.get("/", authMiddleware, getTransactions);
 
@@ -24,8 +27,5 @@ router.put("/:id", authMiddleware, updateTransaction);
 
 // Delete a transaction
 router.delete("/:id", authMiddleware, deleteTransaction);
-
-// Get transaction statistics
-router.get("/stats/summary", authMiddleware, getTransactionStats);
 
 module.exports = router; 
